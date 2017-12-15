@@ -1,0 +1,9 @@
+def star1():
+    gena = 116
+    genb = 299
+    count = 0
+    for n in range(40000000):
+        gena *= 16807
+        genb *= 48271
+        gena %= 2147483647
+        genb %= 2147483647
