@@ -1,6 +1,6 @@
 def get_input():
     f = open('input', 'r')
-    d = f.read()
+    d = f.read().replace(' ', '').split(',')
     f.close()
     return d
 
@@ -14,7 +14,7 @@ def star1():
     nw = d.count('nw')
     se = d.count('se')
     sw = d.count('sw')
-
+    
     if se > nw:
         se -= nw
         nw = 0
@@ -40,6 +40,11 @@ def star1():
         w -= e
         e = 0
 
+
+    k = min(n, e)
+    sw -= k
+    n -= k
+    e -= k
     k = min(s, w)    
     ne -= k
     s -= k
@@ -52,9 +57,5 @@ def star1():
     se -= k
     n -= k
     w -= k
-    k = min(n, e)
-    sw -= k
-    n -= k
-    e -= k
-
+    
     return e + w + s + n + ne + nw + se + sw
