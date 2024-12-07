@@ -1,0 +1,81 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+#define BUFFER_SIZE 18000
+
+int	is_num(char c);
+int	get_num(char *buffer);
+int	day3_1(char *buffer);
+int	day3_2(char *buffer);
+
+int main(int argc, char **argv)
+{
+  int	fd;
+  int	n;
+  char	buffer[BUFFER_SIZE];
+  
+  fd = open(argv[1], O_RDONLY);
+  n = read(fd, buffer, BUFFER_SIZE - 1);
+  buffer[n] = '\0';
+  printf("Day3 - 1 ; %d\n", day3_1(buffer));
+  return (0);
+}
+
+int is_num(char c)
+{
+  if (c >= '0' && c <= '9')
+    return (1);
+  else
+    return (0);
+}
+
+int day3_1(char *buffer)
+{
+  int	n1;
+  int	n2;
+  int	count;
+  char	*ptr;
+
+  count = 0;
+  while (1)
+    {
+      ptr = strchr(buffer, "mul(");
+      if (ptr == NULL)
+	break;
+      buffer = ptr;
+      n1 = get_num(ptr + 1);
+      if (n1 == -1)
+	continue;
+      ptr = strchr(buffer, ",");
+      if (ptr - buffer > 3)
+	continue;
+      buffer = ptr;
+      n2 = get_num(ptr + 1);
+      if (n2 == -1)
+	continue;
+      count += n1 * n2;
+    }
+  return (count)
+}
+
+int get_num(char *buffer)
+{
+  int	i;
+  int	n;
+  char	tmp[4];
+
+  i = 0;
+  n = -1;
+  while (i < 3)
+    {
+      if (buffer[i] == ',')
+	break;
+      if (is_num(buffer[i]) == -1)
+	  return (-1);
+      ++i;
+    }
+  strncpy(buffer, tmp, i);
+  return (atoi(tmp));
+}
