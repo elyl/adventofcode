@@ -1,14 +1,16 @@
+#define _GNU_SOURCE	1
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
 
-#define TAB_SIZE	1024
+#define TAB_SIZE	1400
 
 typedef struct s_page
 {
-  int	required;
-  int	target;
+  int		required;
+  int		target;
   struct s_page	*next;
 }	t_page;
 
@@ -49,37 +51,44 @@ int day5_1(char **tab, int n, t_page *pages)
   int		i;
   int		j;
   int		k;
-  int		len;
+  int		flag;
   int		nb;
-  t_page	*tmp;
   char		*ptr;
   char		*ptr2;
-  int		to_print[10];
+  int		to_print[50];
 
   i = 0;
+  count = 0;
   while (tab[i][0] != '\0')
     ++i;
   ++i;
   while (i < n)
     {
       ptr = tab[i];
-      len = strlen(tab[i]);
       k = 0;
-      while (1)
+      ptr2 = tab[i];
+      flag = 0;
+      while (flag == 0)
 	{
-	  ptr2 = strchr(ptr, ',');
-	  if (ptr2 == NULL)
-	    break;
+	  ptr2 = strchrnul(ptr, ',');
+	  if (*ptr2 == '\0')
+	    flag = 1;
 	  *ptr2 = '\0';
 	  nb = atoi(ptr);
-	  if (is_page_ok(pages, nb, to_print, k) == 0)
-	    break;
 	  to_print[k] = nb;
 	  ++k;
 	  ptr = ptr2 + 1;
 	}
-      if (ptr2 == NULL && is_page_ok(pages, nb, to_print, k) == 0)
+      j = 0;
+      while (j < k)
 	{
+	  if (is_page_ok(pages, to_print[j], to_print, k) == -1)
+	    break;
+	  ++j;
+	}
+      if (j == k)
+	{
+	  printf("i : %d, k : %d, count : %d\n", i, k, to_print[k/2]);
 	  count += to_print[k/2];
 	}
       ++i;
@@ -87,22 +96,97 @@ int day5_1(char **tab, int n, t_page *pages)
   return (count);
 }
 
+int day5_2(char **tab, int n, t_page *pages)
+{
+  int		count;
+  int		i;
+  int		j;
+  int		k;
+  int		flag;
+  int		nb;
+  char		*ptr;
+  char		*ptr2;
+  int		to_print[50];
+
+  i = 0;
+  count = 0;
+  while (tab[i][0] != '\0')
+    ++i;
+  ++i;
+  while (i < n)
+    {
+      ptr = tab[i];
+      k = 0;
+      ptr2 = tab[i];
+      flag = 0;
+      while (flag == 0)
+	{
+	  ptr2 = strchrnul(ptr, ',');
+	  if (*ptr2 == '\0')
+	    flag = 1;
+	  *ptr2 = '\0';
+	  nb = atoi(ptr);
+	  to_print[k] = nb;
+	  ++k;
+	  ptr = ptr2 + 1;
+	}
+      j = 0;
+      while (j < k)
+	{
+	  if (is_page_ok(pages, to_print[j], to_print, k) == -1)
+	    break;
+	  ++j;
+	}
+      if (j != k)
+	{
+	  order_set(pages, to_print, k);
+	  count += to_print[k/2];
+	}
+      ++i;
+    }
+  return (count);
+}
+
+void order_set(t_page pages, int *to_print, int size)
+{
+  t_page	*first;
+  int		i;
+
+  first = pages;
+  i = 0;
+  while (i < size)
+    {
+      
+    }
+}
+
 int is_page_ok(t_page *pages, int nb, int to_print[], int size)
 {
   int	i;
-
+  int	flag1; /* target number has been reached */
+  int	flag2; /* required number is ok */
+  
   while (pages != NULL)
     {
+      flag1 = 0;
+      flag2 = 0;
       if (pages->target == nb)
 	{
 	  i = 0;
 	  while (i < size)
 	    {
+	      if (nb == to_print[i])
+		flag1 = 1;
 	      if (to_print[i] == pages->required)
-		break;
+		{
+		  if (flag1 == 1 && flag2 == 0)
+		    flag2 = -1;
+		  else
+		    flag2 = 1;
+		}
 	      ++i;
 	    }
-	  if (i > size)
+	  if (flag2 == -1)
 	    return (-1);
 	}
       pages = pages->next;
